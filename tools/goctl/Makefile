@@ -1,3 +1,7 @@
+.PHONY: generate
+generate:
+	cd example/api && ./generate_go.sh
+
 build:
 	go build -ldflags="-s -w" goctl.go
 	$(if $(shell command -v upx || which upx), upx goctl)

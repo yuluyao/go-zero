@@ -4,21 +4,25 @@
 package {{.pkgName}}
 
 import (
+	"log/slog"
+
 	{{.imports}}
+	
+    "github.com/gin-gonic/gin"
 )
 
 type {{.logic}} struct {
-	logx.Logger
-	ctx    context.Context
+	c      *gin.Context
 	svcCtx *svc.ServiceContext
+    logger *slog.Logger
 }
 
 {{if .hasDoc}}{{.doc}}{{end}}
-func New{{.logic}}(ctx context.Context, svcCtx *svc.ServiceContext) *{{.logic}} {
+func New{{.logic}}(c *gin.Context, svcCtx *svc.ServiceContext) *{{.logic}} {
 	return &{{.logic}}{
-		Logger: logx.WithContext(ctx),
-		ctx:    ctx,
+		c:      c,
 		svcCtx: svcCtx,
+		logger: slog.With("m", "{{.logic}}"),
 	}
 }
 

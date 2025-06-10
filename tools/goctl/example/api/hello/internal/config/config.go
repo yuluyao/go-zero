@@ -1,5 +1,5 @@
 // Code scaffolded by goctl. Safe to edit.
-// goctl {{.version}}
+// goctl <no value>
 
 package config
 

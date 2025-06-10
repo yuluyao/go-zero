@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
-
+	
 	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -59,7 +59,7 @@ func GoCommand(_ *cobra.Command, _ []string) error {
 			home = repo
 		}
 	}
-
+	
 	if len(home) > 0 {
 		pathx.RegisterGoctlHome(home)
 	}
@@ -69,7 +69,7 @@ func GoCommand(_ *cobra.Command, _ []string) error {
 	if len(dir) == 0 {
 		return errors.New("missing -dir")
 	}
-
+	
 	return DoGenProject(apiFile, dir, namingStyle, withTest)
 }
 
@@ -80,54 +80,50 @@ func DoGenProject(apiFile, dir, style string, withTest bool) error {
 
 // DoGenProjectWithModule gen go project files with api file using custom module name
 func DoGenProjectWithModule(apiFile, dir, moduleName, style string, withTest bool) error {
+	
 	api, err := parser.Parse(apiFile)
 	if err != nil {
 		return err
 	}
-
+	
 	if err := api.Validate(); err != nil {
 		return err
 	}
-
+	
 	cfg, err := config.NewConfig(style)
 	if err != nil {
 		return err
 	}
-
+	
 	logx.Must(pathx.MkdirIfNotExist(dir))
-
-	var rootPkg, projectPkg string
-	if len(moduleName) > 0 {
-		rootPkg, projectPkg, err = golang.GetParentPackageWithModule(dir, moduleName)
-	} else {
-		rootPkg, projectPkg, err = golang.GetParentPackage(dir)
-	}
+	rootPkg, projectPkg, err := golang.GetParentPackage(dir)
 	if err != nil {
 		return err
 	}
-
+	
 	logx.Must(genEtc(dir, cfg, api))
-	logx.Must(genConfig(dir, projectPkg, cfg, api))
-	logx.Must(genMain(dir, rootPkg, projectPkg, cfg, api))
-	logx.Must(genServiceContext(dir, rootPkg, projectPkg, cfg, api))
+	logx.Must(genConfig(dir, cfg, api))
+	logx.Must(genMain(dir, rootPkg, cfg, api))
+	logx.Must(genServiceContext(dir, rootPkg, cfg, api))
 	logx.Must(genTypes(dir, cfg, api))
-	logx.Must(genRoutes(dir, rootPkg, projectPkg, cfg, api))
+	logx.Must(genRoutes(dir, rootPkg, cfg, api))
+	logx.Must(genResponse(dir, rootPkg, cfg, api))
 	logx.Must(genHandlers(dir, rootPkg, projectPkg, cfg, api))
 	logx.Must(genLogic(dir, rootPkg, projectPkg, cfg, api))
-	logx.Must(genMiddleware(dir, cfg, api))
+	logx.Must(genMiddleware(dir, rootPkg, cfg, api))
 	if withTest {
 		logx.Must(genHandlersTest(dir, rootPkg, projectPkg, cfg, api))
 		logx.Must(genLogicTest(dir, rootPkg, projectPkg, cfg, api))
 	}
-
+	
 	if err := backupAndSweep(apiFile); err != nil {
 		return err
 	}
-
+	
 	if err := apiformat.ApiFormatByPath(apiFile, false); err != nil {
 		return err
 	}
-
+	
 	fmt.Println(color.Green.Render("Done."))
 	return nil
 }
@@ -135,10 +131,10 @@ func DoGenProjectWithModule(apiFile, dir, moduleName, style string, withTest boo
 func backupAndSweep(apiFile string) error {
 	var err error
 	var wg sync.WaitGroup
-
+	
 	wg.Add(2)
 	_ = os.MkdirAll(tmpDir, os.ModePerm)
-
+	
 	go func() {
 		_, fileName := filepath.Split(apiFile)
 		_, e := apiutil.Copy(apiFile, fmt.Sprintf(path.Join(tmpDir, tmpFile), fileName, time.Now().Unix()))
@@ -154,7 +150,7 @@ func backupAndSweep(apiFile string) error {
 		wg.Done()
 	}()
 	wg.Wait()
-
+	
 	return err
 }
 
@@ -164,7 +160,7 @@ func sweep() error {
 		if info.IsDir() {
 			return nil
 		}
-
+		
 		pos := strings.LastIndexByte(info.Name(), '-')
 		if pos > 0 {
 			timestamp := info.Name()[pos+1:]
@@ -174,7 +170,7 @@ func sweep() error {
 				fmt.Println(color.Red.Sprintf("sweep ignored file: %s", fpath))
 				return nil
 			}
-
+			
 			tm := time.Unix(seconds, 0)
 			if tm.Before(keepTime) {
 				if err := os.RemoveAll(fpath); err != nil {
@@ -183,7 +179,7 @@ func sweep() error {
 				}
 			}
 		}
-
+		
 		return nil
 	})
 }

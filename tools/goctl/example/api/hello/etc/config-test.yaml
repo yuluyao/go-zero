@@ -1,5 +1,5 @@
-Host: {{.host}}
-Port: {{.port}}
+Host: 0.0.0.0
+Port: 8888
 
 Jwt:
   Secret: ""

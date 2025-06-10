@@ -3,7 +3,11 @@
 
 package middleware
 
-import "net/http"
+import (
+    {{.importPackages}}
+
+    "github.com/gin-gonic/gin"
+)
 
 type {{.name}} struct {
 }
@@ -12,11 +16,11 @@ func New{{.name}}() *{{.name}} {
 	return &{{.name}}{}
 }
 
-func (m *{{.name}})Handle(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (m *{{.name}})Handle(svcCtx *svc.ServiceContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		// TODO generate middleware implement function, delete after code implementation
 
 		// Passthrough to next handler if need
-		next(w, r)
+		c.Next()
 	}
 }

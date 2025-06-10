@@ -1,0 +1,28 @@
+syntax = "v1"
+
+type (
+	HealthResp {
+		Status string `json:"status"`
+	}
+	PromptEntity {
+		Id      int    `json:"id"`
+		Title   string `json:"title"`
+		Content string `json:"content"`
+	}
+	ConfigResp {
+		Version       int            `json:"version"`
+		SystemPrompts []PromptEntity `json:"systemPrompts"`
+	}
+)
+
+@server (
+	prefix: /app
+)
+service app_api {
+	@handler Health
+	get /health returns (HealthResp)
+
+	@handler Config
+	get /config returns (ConfigResp)
+}
+

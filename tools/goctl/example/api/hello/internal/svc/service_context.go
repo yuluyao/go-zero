@@ -1,17 +1,17 @@
 // Code scaffolded by goctl. Safe to edit.
-// goctl {{.version}}
+// goctl <no value>
 
 package svc
 
 import (
-	{{.configImport}}
+	"hello/internal/config"
 )
 
 type ServiceContext struct {
-	Config {{.config}}
+	Config config.Config
 }
 
-func NewServiceContext(c {{.config}}) *ServiceContext {
+func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
 	}

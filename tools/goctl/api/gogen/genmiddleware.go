@@ -2,18 +2,19 @@ package gogen
 
 import (
 	_ "embed"
+	"fmt"
 	"strings"
 
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 	"github.com/zeromicro/go-zero/tools/goctl/config"
-	"github.com/zeromicro/go-zero/tools/goctl/internal/version"
 	"github.com/zeromicro/go-zero/tools/goctl/util/format"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 //go:embed middleware.tpl
 var middlewareImplementCode string
 
-func genMiddleware(dir string, cfg *config.Config, api *spec.ApiSpec) error {
+func genMiddleware(dir string, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	middlewares := getMiddleware(api)
 	for _, item := range middlewares {
 		middlewareFilename := strings.TrimSuffix(strings.ToLower(item), "middleware") + "_middleware"
@@ -32,8 +33,8 @@ func genMiddleware(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 			templateFile:    middlewareImplementCodeFile,
 			builtinTemplate: middlewareImplementCode,
 			data: map[string]string{
-				"name":    strings.Title(name),
-				"version": version.BuildVersion,
+				"name":           strings.Title(name),
+				"importPackages": genMiddlewareImports(rootPkg, api),
 			},
 		})
 		if err != nil {
@@ -42,4 +43,8 @@ func genMiddleware(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 	}
 
 	return nil
+}
+
+func genMiddlewareImports(parentPkg string, api *spec.ApiSpec) string {
+	return fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir))
 }

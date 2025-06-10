@@ -1,5 +1,5 @@
 // Code scaffolded by goctl. Safe to edit.
-// goctl {{.version}}
+// goctl <no value>
 
 package main
 
@@ -9,12 +9,13 @@ import (
 	"os"
 	"time"
 
-    "github.com/gin-gonic/gin"
-    "gopkg.in/yaml.v3"
+	"github.com/gin-gonic/gin"
+	"gopkg.in/yaml.v3"
 
-	{{.importPackages}}
+	"hello/internal/config"
+	"hello/internal/handler"
+	"hello/internal/svc"
 )
-
 
 // 环境默认是[dev]
 var envMode = "dev"

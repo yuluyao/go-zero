@@ -4,27 +4,22 @@
 package {{.PkgName}}
 
 import (
-	"net/http"
+    {{if .HasRequest}}"net/http"{{end}}
 
-	"github.com/zeromicro/go-zero/rest/httpx"
 	{{.ImportPackages}}
+    
+    "github.com/gin-gonic/gin"
 )
 
-{{if .HasDoc}}{{.Doc}}{{end}}
-func {{.HandlerName}}(svcCtx *svc.ServiceContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func {{.HandlerName}}(svcCtx *svc.ServiceContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
 		{{if .HasRequest}}var req types.{{.RequestType}}
-		if err := httpx.Parse(r, &req); err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-			return
-		}
-
-		{{end}}l := {{.LogicName}}.New{{.LogicType}}(r.Context(), svcCtx)
-		{{if .HasResp}}resp, {{end}}err := l.{{.Call}}({{if .HasRequest}}&req{{end}})
-		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			{{if .HasResp}}httpx.OkJsonCtx(r.Context(), w, resp){{else}}httpx.Ok(w){{end}}
-		}
+        if err := c.ShouldBind(&req); err != nil {
+			response.ResponseInvalid(c, http.StatusBadRequest, err)
+            return
+        }
+		{{end}}l := {{.LogicName}}.New{{.LogicType}}(c, svcCtx)
+        {{if .HasResp}}resp, {{end}}err := l.{{.Call}}({{if .HasRequest}}&req{{end}})
+        {{if .HasResp}}response.Response(c, resp, err){{else}}response.Response(c, nil, err){{end}}
 	}
 }

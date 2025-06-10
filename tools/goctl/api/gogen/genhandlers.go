@@ -86,6 +86,7 @@ func genHandlerImports(group spec.Group, route spec.Route, parentPkg string) str
 	imports := []string{
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, getLogicFolderPath(group, route))),
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)),
+		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, responseDir)),
 	}
 	sse := group.GetAnnotation("sse")
 	if len(route.RequestTypeName()) > 0 || sse == "true" {
