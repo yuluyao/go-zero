@@ -15,8 +15,6 @@ var (
 	VarStringDir string
 	// VarStringAPI defines the API.
 	VarStringAPI string
-	// VarStringLegacy describes whether legacy.
-	VarStringLegacy bool
 	// VarStringHostname defines the hostname.
 	VarStringHostname string
 	// VarStringSchema defines the scheme.
@@ -27,7 +25,6 @@ var (
 func DartCommand(_ *cobra.Command, _ []string) error {
 	apiFile := VarStringAPI
 	dir := VarStringDir
-	isLegacy := VarStringLegacy
 	hostname := VarStringHostname
 	scheme := VarStringScheme
 	if len(apiFile) == 0 {
@@ -59,9 +56,9 @@ func DartCommand(_ *cobra.Command, _ []string) error {
 		dir = dir + "/"
 	}
 	api.Info.Title = strings.Replace(apiFile, ".api", "", -1)
-	logx.Must(genData(dir+"data/", api, isLegacy))
-	logx.Must(genApi(dir+"api/", api, isLegacy))
-	logx.Must(genVars(dir+"vars/", isLegacy, scheme, hostname))
+	logx.Must(genData(dir+"zero/", api))
+	logx.Must(genApi(dir+"zero/", api))
+	// logx.Must(genVars(dir+"vars/", isLegacy, scheme, hostname))
 	if err := formatDir(dir); err != nil {
 		logx.Errorf("failed to format, %v", err)
 	}

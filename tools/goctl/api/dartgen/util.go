@@ -32,6 +32,15 @@ func lowCamelCase(s string) string {
 	return util.ToLower(s[:1]) + s[1:]
 }
 
+func highCamelCase(s string) string {
+	if len(s) < 1 {
+		return ""
+	}
+
+	s = util.ToCamelCase(util.ToSnakeCase(s))
+	return util.ToUpper(s[:1]) + s[1:]
+}
+
 func getBaseName(str string) string {
 	return path.Base(str)
 }
@@ -193,7 +202,7 @@ func specTypeToDart(tp spec.Type) (string, error) {
 		}
 		return fmt.Sprintf("List<%s>", valueType), nil
 	case spec.InterfaceType:
-		return "Object?", nil
+		return "dynamic", nil
 	case spec.PointerType:
 		valueType, err := specTypeToDart(v.Type)
 		if err != nil {
@@ -222,7 +231,7 @@ func getBaseType(valueType string) string {
 
 func primitiveType(tp string) (string, bool) {
 	switch tp {
-	case "string":
+	case "string", "String":
 		return "String", true
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "rune":
 		return "int", true

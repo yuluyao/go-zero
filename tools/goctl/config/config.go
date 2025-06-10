@@ -14,7 +14,7 @@ import (
 
 const (
 	// DefaultFormat defines a default naming style
-	DefaultFormat = "gozero"
+	DefaultFormat = "go_zero"
 	configFile    = "goctl.yaml"
 )
 
